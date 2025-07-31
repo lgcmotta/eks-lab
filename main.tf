@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "3.0.2"
+    }
   }
   backend "s3" {
     bucket       = var.aws.bucket
@@ -70,4 +74,16 @@ module "ecr" {
     }
   ]
   depends_on = [module.eks]
+}
+
+module "load_balancer_controller" {
+  source     = "./modules/lb_controller"
+  aws_region = var.aws.region
+  cluster = {
+    name           = module.eks.cluster_id
+    endpoint       = module.eks.cluster_endpoint
+    ca_certificate = module.eks.cluster_ca_certificate
+    role_arn       = module.eks.load_balancer_controller_role_arn
+  }
+  vpc_id = module.vpc.vpc_id
 }
