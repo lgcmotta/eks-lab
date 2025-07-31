@@ -8,14 +8,21 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+var basePath = app.Configuration.GetValue("APPLICATION_BASE_PATH", string.Empty);
+
+const string pattern = "openapi/{documentName}/openapi.json";
+app.UsePathBase(new PathString(basePath));
 app.MapHealthChecks("/healthz/live");
-app.MapOpenApi();
+
+app.MapOpenApi($"{basePath}/{pattern}");
+
 app.MapScalarApiReference(options =>
 {
     options.WithTheme(ScalarTheme.DeepSpace)
         .WithDefaultHttpClient(ScalarTarget.Shell, ScalarClient.Curl)
         .WithDarkMode()
         .WithDarkModeToggle()
+        .WithOpenApiRoutePattern($"{basePath}/{pattern}")
         .WithTitle("EKS Hello World Demo");
 });
 
