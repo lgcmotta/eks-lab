@@ -40,11 +40,10 @@ module "eks" {
   source     = "./modules/eks"
   subnet_ids = module.vpc.private_subnet_ids
   eks = {
-    name                = var.eks.cluster_name
-    version             = "1.33"
-    role_name           = "devops-cluster-role"
-    authentication_mode = "API_AND_CONFIG_MAP"
-
+    name                      = var.eks.cluster_name
+    version                   = "1.33"
+    role_name                 = "devops-cluster-role"
+    authentication_mode       = "API_AND_CONFIG_MAP"
     enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   }
   node_group = {
