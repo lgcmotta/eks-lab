@@ -44,9 +44,9 @@ resource "aws_eks_node_group" "this" {
   depends_on = [aws_eks_cluster.this, module.iam_node_group]
 }
 
-module "iam_load_balancer" {
-  source       = "./iam/controller"
-  cluster_name = aws_eks_cluster.this.id
-  issuer       = aws_eks_cluster.this.identity[0].oidc[0].issuer
-  depends_on   = [aws_eks_cluster.this, aws_eks_node_group.this]
-}
+# module "iam_load_balancer" {
+#   source       = "./iam/controller"
+#   cluster_name = aws_eks_cluster.this.id
+#   issuer       = aws_eks_cluster.this.identity[0].oidc[0].issuer
+#   depends_on   = [aws_eks_cluster.this, aws_eks_node_group.this]
+# }

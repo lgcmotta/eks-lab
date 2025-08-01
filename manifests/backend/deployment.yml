@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend-deployment
-          image: 666778573170.dkr.ecr.us-east-1.amazonaws.com/motta/dvn-workshop/backend
+          image: 666778573170.dkr.ecr.us-east-1.amazonaws.com/motta/workshop/backend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -25,5 +25,3 @@ spec:
               value: Development
             - name: ASPNETCORE_URLS
               value: http://*:8080
-            - name: APPLICATION_BASE_PATH
-              value: /api/hello

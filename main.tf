@@ -9,6 +9,10 @@ terraform {
       source  = "hashicorp/helm"
       version = "3.0.2"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.38.0"
+    }
   }
   backend "s3" {
     bucket       = var.aws.bucket
@@ -42,13 +46,13 @@ module "eks" {
   eks = {
     name                      = var.eks.cluster_name
     version                   = "1.33"
-    role_name                 = "devops-cluster-role"
+    role_name                 = "motta-cluster-role"
     authentication_mode       = "API_AND_CONFIG_MAP"
     enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   }
   node_group = {
-    name           = "devops-node-group"
-    role_name      = "devops-ng-role"
+    name           = "motta-node-group"
+    role_name      = "motta-ng-role"
     instance_types = ["t3.medium"]
     capacity_type  = "ON_DEMAND"
     scaling = {
@@ -64,25 +68,40 @@ module "ecr" {
   source = "./modules/ecr"
   repositories = [
     {
-      name                 = "motta/dvn-workshop/backend"
-      image_tag_mutability = "MUTABLE"
-    },
-    {
-      name                 = "motta/dvn-workshop/frontend"
+      name                 = "motta/workshop/backend"
       image_tag_mutability = "MUTABLE"
     }
   ]
   depends_on = [module.eks]
 }
 
-module "load_balancer_controller" {
-  source     = "./modules/lb_controller"
-  aws_region = var.aws.region
+module "nginx" {
+  source = "./modules/nginx"
   cluster = {
     name           = module.eks.cluster_id
     endpoint       = module.eks.cluster_endpoint
     ca_certificate = module.eks.cluster_ca_certificate
-    role_arn       = module.eks.load_balancer_controller_role_arn
   }
-  vpc_id = module.vpc.vpc_id
 }
+
+module "alb" {
+  source                     = "./modules/alb"
+  vpc_id                     = module.vpc.vpc_id
+  name                       = "workshop"
+  subnet_ids                 = module.vpc.public_subnet_ids
+  node_group_asg_name        = module.eks.node_group_asg_name
+  cluster_security_group_ids = module.eks.cluster_security_group_ids
+  depends_on                 = [module.vpc, module.eks, module.nginx]
+}
+
+# module "load_balancer_controller" {
+#   source     = "./modules/lb_controller"
+#   aws_region = var.aws.region
+#   cluster = {
+#     name           = module.eks.cluster_id
+#     endpoint       = module.eks.cluster_endpoint
+#     ca_certificate = module.eks.cluster_ca_certificate
+#     role_arn       = module.eks.load_balancer_controller_role_arn
+#   }
+#   vpc_id = module.vpc.vpc_id
+# }
