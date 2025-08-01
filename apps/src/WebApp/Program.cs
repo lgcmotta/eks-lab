@@ -1,10 +1,27 @@
+using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using System.Net.Mime;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHealthChecks();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, ctx, _) =>
+    {
+        var cfg = ctx.ApplicationServices.GetRequiredService<IConfiguration>();
+        var url = cfg.GetValue("OPENAPI_SERVER_URL", string.Empty);
+        
+        if (!string.IsNullOrWhiteSpace(url))
+        {
+            return Task.CompletedTask;
+        }
+        
+        document.Servers.Clear();
+        document.Servers.Add(new OpenApiServer { Url = url });
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 

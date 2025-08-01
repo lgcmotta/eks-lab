@@ -25,3 +25,5 @@ spec:
               value: Development
             - name: ASPNETCORE_URLS
               value: http://*:8080
+            - name: OPENAPI_SERVER_URL
+              value: http://workshop-969676173.us-east-1.elb.amazonaws.com/api
