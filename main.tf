@@ -91,7 +91,6 @@ module "alb" {
   subnet_ids                 = module.vpc.public_subnet_ids
   node_group_asg_name        = module.eks.node_group_asg_name
   cluster_security_group_ids = module.eks.cluster_security_group_ids
-  depends_on                 = [module.vpc, module.eks, module.nginx]
 }
 
 # module "load_balancer_controller" {
