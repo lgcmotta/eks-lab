@@ -1,9 +1,0 @@
-resources:
-  - backend/deployment.yml
-  - backend/service.yml
-  - ingress.yml
-
-images:
-  - name: 666778573170.dkr.ecr.us-east-1.amazonaws.com/motta/workshop/backend
-    newName: 666778573170.dkr.ecr.us-east-1.amazonaws.com/motta/workshop/backend
-    newTag: latest

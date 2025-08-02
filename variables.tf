@@ -8,21 +8,9 @@ variable "aws" {
   })
 }
 
-variable "vpc" {
-  type = object({
-    name       = string
-    cidr_block = string
-  })
-}
-
-variable "igw" {
-  type = object({
-    name = string
-  })
-}
-
-variable "eks" {
-  type = object({
-    cluster_name = string
-  })
+variable "ecr_repositories" {
+  type = list(object({
+    name                 = string
+    image_tag_mutability = string
+  }))
 }

@@ -22,21 +22,29 @@ terraform {
   }
 }
 
+provider "aws" {
+  region = var.aws.region
+  assume_role {
+    role_arn = var.aws.assume_role_arn
+  }
+  default_tags {
+    tags = merge(var.aws.tags, {})
+  }
+}
+
 module "vpc" {
   source = "./modules/vpc"
   vpc = {
-    name       = var.vpc.name
-    cidr_block = var.vpc.cidr_block
+    name       = "eks-lab-vpc"
+    cidr_block = "10.0.0.0/16"
+    igw_name   = "eks-lab-igw"
     public_subnet_tags = {
       "kubernetes.io/role/elb" = "1"
     }
     private_subnet_tags = {
-      "kubernetes.io/role/internal-elb"               = "1"
-      "kubernetes.io/cluster/${var.eks.cluster_name}" = "shared"
+      "kubernetes.io/role/internal-elb" = "1"
+      "kubernetes.io/cluster/eks-lab"   = "shared"
     }
-  }
-  igw = {
-    name = var.igw.name
   }
 }
 
@@ -44,15 +52,15 @@ module "eks" {
   source     = "./modules/eks"
   subnet_ids = module.vpc.private_subnet_ids
   eks = {
-    name                      = var.eks.cluster_name
+    name                      = "eks-lab"
     version                   = "1.33"
-    role_name                 = "motta-cluster-role"
+    role_name                 = "EKSLabRole"
     authentication_mode       = "API_AND_CONFIG_MAP"
     enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   }
   node_group = {
-    name           = "motta-node-group"
-    role_name      = "motta-ng-role"
+    name           = "eks-lab-node-group"
+    role_name      = "EKSLabNodeGroupRole"
     instance_types = ["t3.medium"]
     capacity_type  = "ON_DEMAND"
     scaling = {
@@ -64,16 +72,6 @@ module "eks" {
   depends_on = [module.vpc]
 }
 
-module "ecr" {
-  source = "./modules/ecr"
-  repositories = [
-    {
-      name                 = "motta/workshop/backend"
-      image_tag_mutability = "MUTABLE"
-    }
-  ]
-  depends_on = [module.eks]
-}
 
 module "nginx" {
   source = "./modules/nginx"
@@ -87,20 +85,14 @@ module "nginx" {
 module "alb" {
   source                     = "./modules/alb"
   vpc_id                     = module.vpc.vpc_id
-  name                       = "workshop"
+  name                       = "eks-lab"
   subnet_ids                 = module.vpc.public_subnet_ids
   node_group_asg_name        = module.eks.node_group_asg_name
   cluster_security_group_ids = module.eks.cluster_security_group_ids
 }
 
-# module "load_balancer_controller" {
-#   source     = "./modules/lb_controller"
-#   aws_region = var.aws.region
-#   cluster = {
-#     name           = module.eks.cluster_id
-#     endpoint       = module.eks.cluster_endpoint
-#     ca_certificate = module.eks.cluster_ca_certificate
-#     role_arn       = module.eks.load_balancer_controller_role_arn
-#   }
-#   vpc_id = module.vpc.vpc_id
-# }
+module "ecr" {
+  source       = "./modules/ecr"
+  repositories = var.ecr_repositories
+  depends_on   = [module.alb]
+}
