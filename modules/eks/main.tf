@@ -44,6 +44,24 @@ resource "aws_eks_node_group" "this" {
   depends_on = [aws_eks_cluster.this, module.iam_node_group]
 }
 
+resource "aws_eks_access_entry" "this" {
+  cluster_name  = aws_eks_cluster.this.id
+  principal_arn = var.cluster_admin_arn
+  type          = "STANDARD"
+  depends_on    = [aws_eks_cluster.this]
+}
+
+resource "aws_eks_access_policy_association" "this" {
+  for_each      = { for idx, policy in ["AmazonEKSAdminPolicy", "AmazonEKSClusterAdminPolicy"] : idx => policy }
+  cluster_name  = aws_eks_cluster.this.id
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/${each.value}"
+  principal_arn = var.cluster_admin_arn
+  access_scope {
+    type = "cluster"
+  }
+  depends_on = [aws_eks_access_entry.this]
+}
+
 # module "iam_load_balancer" {
 #   source       = "./iam/controller"
 #   cluster_name = aws_eks_cluster.this.id

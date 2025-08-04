@@ -25,3 +25,7 @@ variable "node_group" {
 variable "subnet_ids" {
   type = list(string)
 }
+
+variable "cluster_admin_arn" {
+  type = string
+}
