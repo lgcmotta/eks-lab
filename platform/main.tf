@@ -45,6 +45,17 @@ provider "kubernetes" {
   }
 }
 
+# AWS Load Balancer Controller exists here as an example.
+# module "iam_load_balancer" {
+#   source     = "../modules/load_balancer_controller"
+#   aws_region = var.aws.region
+#   vpc_id     = var.vpc_info.id
+#   cluster = {
+#     name   = var.eks_info.id
+#     issuer = var.eks_info.issuer
+#   }
+# }
+
 module "nginx" {
   source = "../modules/nginx"
   cluster = {

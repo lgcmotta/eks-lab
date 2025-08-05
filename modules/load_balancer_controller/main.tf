@@ -1,13 +1,7 @@
-provider "helm" {
-  kubernetes = {
-    host                   = var.cluster.endpoint
-    cluster_ca_certificate = base64decode(var.cluster.ca_certificate)
-    exec = {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "get-token", "--cluster-name", var.cluster.name]
-      command     = "aws"
-    }
-  }
+module "lb_controller_iam" {
+  source       = "./iam"
+  cluster_name = var.cluster.name
+  issuer       = var.cluster.issuer
 }
 
 resource "helm_release" "this" {

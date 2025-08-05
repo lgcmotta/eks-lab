@@ -33,11 +33,13 @@ resource "aws_eks_node_group" "this" {
   subnet_ids      = var.subnet_ids
   instance_types  = var.node_group.instance_types
   capacity_type   = var.node_group.capacity_type
+
   scaling_config {
     desired_size = var.node_group.scaling.desired
     max_size     = var.node_group.scaling.max
     min_size     = var.node_group.scaling.min
   }
+
   tags = {
     "kubernetes.io/cluster/${var.eks.name}" = "owned"
   }
@@ -52,19 +54,14 @@ resource "aws_eks_access_entry" "this" {
 }
 
 resource "aws_eks_access_policy_association" "this" {
-  for_each      = { for idx, policy in ["AmazonEKSAdminPolicy", "AmazonEKSClusterAdminPolicy"] : idx => policy }
+  for_each      = toset(["AmazonEKSAdminPolicy", "AmazonEKSClusterAdminPolicy"])
   cluster_name  = aws_eks_cluster.this.id
-  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/${each.value}"
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/${each.key}"
   principal_arn = var.cluster_admin_arn
+
   access_scope {
     type = "cluster"
   }
+
   depends_on = [aws_eks_access_entry.this]
 }
-
-# module "iam_load_balancer" {
-#   source       = "./iam/controller"
-#   cluster_name = aws_eks_cluster.this.id
-#   issuer       = aws_eks_cluster.this.identity[0].oidc[0].issuer
-#   depends_on   = [aws_eks_cluster.this, aws_eks_node_group.this]
-# }

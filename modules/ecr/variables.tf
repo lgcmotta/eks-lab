@@ -4,4 +4,3 @@ variable "repositories" {
     image_tag_mutability = string
   }))
 }
-

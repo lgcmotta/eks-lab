@@ -8,9 +8,7 @@ variable "vpc_id" {
 
 variable "cluster" {
   type = object({
-    name           = string
-    endpoint       = string
-    ca_certificate = string
-    role_arn       = string
+    name   = string
+    issuer = string
   })
 }

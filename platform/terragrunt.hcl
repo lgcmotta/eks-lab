@@ -10,6 +10,7 @@ dependency "infrastructure" {
       id             = "mock-cluster"
       endpoint       = "https://mock.eks.amazonaws.com"
       ca_certificate = "LS0tLS1CRUdJTi0="
+      issuer         = "https://mock.eks.amazonaws.com"
     }
   }
   mock_outputs_allowed_terraform_commands = ["init", "plan"]
@@ -24,5 +25,6 @@ inputs = {
       enviroment = "dev"
     }
   }
+  vpc_info   = dependency.infrastructure.outputs.vpc_info
   eks_info = dependency.infrastructure.outputs.eks_info
 }

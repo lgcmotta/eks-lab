@@ -25,7 +25,3 @@ output "node_group_asg_name" {
 output "node_security_group_id" {
   value = aws_eks_node_group.this.resources[0].remote_access_security_group_id
 }
-
-# output "load_balancer_controller_role_arn" {
-#   value = module.iam_load_balancer.role_arn
-# }

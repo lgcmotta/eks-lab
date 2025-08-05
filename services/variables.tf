@@ -7,8 +7,9 @@ variable "aws" {
 
 variable "vpc_info" {
   type = object({
-    id                = string
-    public_subnet_ids = list(string)
+    id                 = string
+    public_subnet_ids  = list(string)
+    private_subnet_ids = list(string)
   })
 }
 

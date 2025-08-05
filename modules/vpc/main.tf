@@ -45,7 +45,7 @@ resource "aws_subnet" "private" {
   depends_on              = [aws_vpc.this]
 }
 
-resource "aws_eip" "nat" {
+resource "aws_eip" "this" {
   for_each = aws_subnet.public
   tags = {
     Name = "${var.vpc.name}-eip-${each.key}"
@@ -54,7 +54,7 @@ resource "aws_eip" "nat" {
 }
 
 resource "aws_nat_gateway" "this" {
-  for_each      = aws_eip.nat
+  for_each      = aws_eip.this
   allocation_id = each.value.id
   subnet_id     = aws_subnet.public[each.key].id
 

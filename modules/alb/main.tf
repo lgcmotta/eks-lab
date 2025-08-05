@@ -1,28 +1,8 @@
-variable "name" {
-  type = string
-}
-
-variable "subnet_ids" {
-  type = list(string)
-}
-
-variable "vpc_id" {
-  type = string
-}
-
-variable "node_group_asg_name" {
-  type = string
-}
-
-variable "cluster_security_group_ids" {
-  type = list(string)
-}
-
-data "aws_autoscaling_group" "nodes" {
+data "aws_autoscaling_group" "this" {
   name = var.node_group_asg_name
 }
 
-data "aws_instances" "node" {
+data "aws_instances" "this" {
   filter {
     name   = "tag:aws:autoscaling:groupName"
     values = [var.node_group_asg_name]
@@ -120,7 +100,7 @@ resource "aws_lb_listener" "this" {
 }
 
 resource "aws_lb_target_group_attachment" "this" {
-  for_each         = toset(data.aws_instances.node.ids)
+  for_each         = toset(data.aws_instances.this.ids)
   target_group_arn = aws_lb_target_group.this.arn
   target_id        = each.value
   port             = 32080
