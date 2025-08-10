@@ -1,7 +1,3 @@
-data "aws_autoscaling_group" "this" {
-  name = var.node_group_asg_name
-}
-
 data "aws_instances" "this" {
   filter {
     name   = "tag:aws:autoscaling:groupName"
