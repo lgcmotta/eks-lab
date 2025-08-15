@@ -1,0 +1,35 @@
+variable "aws" {
+  type = object({
+    region = string
+    tags   = map(string)
+  })
+}
+
+variable "vpc" {
+  type = object({
+    id                 = string
+    private_subnet_ids = list(string)
+  })
+}
+
+variable "eks" {
+  type = object({
+    name      = string
+    version   = string
+    role_name = string
+  })
+}
+
+variable "node_group" {
+  type = object({
+    name           = string
+    role_name      = string
+    capacity_type  = string
+    instance_types = list(string)
+    scaling = object({
+      desired = number
+      max     = number
+      min     = number
+    })
+  })
+}

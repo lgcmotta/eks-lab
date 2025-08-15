@@ -20,7 +20,7 @@ resource "aws_vpc" "this" {
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
   tags = {
-    Name = var.vpc.igw_name
+    Name = var.vpc.internet_gateway
   }
   depends_on = [aws_vpc.this]
 }
@@ -31,8 +31,11 @@ resource "aws_subnet" "public" {
   cidr_block              = cidrsubnet(var.vpc.cidr_block, 6, each.value)
   availability_zone       = each.key
   map_public_ip_on_launch = true
-  tags                    = merge({ Name = "${var.vpc.name}-public-${each.key}" }, var.vpc.public_subnet_tags)
-  depends_on              = [aws_vpc.this]
+  tags = merge(var.vpc.public_subnet_tags, {
+    Name   = "${var.vpc.name}-public-${each.key}"
+    Access = "public"
+  })
+  depends_on = [aws_vpc.this]
 }
 
 resource "aws_subnet" "private" {
@@ -41,8 +44,11 @@ resource "aws_subnet" "private" {
   cidr_block              = cidrsubnet(var.vpc.cidr_block, 4, each.value + 4)
   availability_zone       = each.key
   map_public_ip_on_launch = false
-  tags                    = merge({ Name = "${var.vpc.name}-private-${each.key}" }, var.vpc.private_subnet_tags)
-  depends_on              = [aws_vpc.this]
+  tags = merge(var.vpc.private_subnet_tags, {
+    Name   = "${var.vpc.name}-private-${each.key}"
+    Access = "private"
+  })
+  depends_on = [aws_vpc.this]
 }
 
 resource "aws_eip" "this" {

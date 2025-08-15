@@ -10,10 +10,6 @@ variable "vpc_id" {
   type = string
 }
 
-variable "node_group_asg_name" {
+variable "certificate_arn" {
   type = string
-}
-
-variable "cluster_security_group_ids" {
-  type = list(string)
 }

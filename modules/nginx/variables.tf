@@ -1,7 +1,6 @@
-variable "cluster" {
+variable "ports" {
   type = object({
-    name           = string
-    endpoint       = string
-    ca_certificate = string
+    health_check = number
+    http         = number
   })
 }
