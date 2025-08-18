@@ -40,6 +40,6 @@ inputs = {
     http_port         = 32181
   }
   rancher = {
-    secret_path = "rancher/bootstrap/password"
+    secret_path = "/rancher/bootstrap/password"
   }
 }

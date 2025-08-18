@@ -91,6 +91,12 @@ inputs = {
     id                = dependency.network.outputs.vpc_id
     public_subnet_ids = dependency.network.outputs.public_subnet_ids
   }
+  services = {
+    security_group_ids = dependency.services.outputs.cluster.security_group_ids
+  }
+  rancher = {
+    security_group_ids = dependency.rancher.outputs.cluster.security_group_ids
+  }
   targets = [
     {
       name          = "services"

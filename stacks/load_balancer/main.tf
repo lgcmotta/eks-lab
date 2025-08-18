@@ -31,6 +31,17 @@ module "alb" {
   depends_on      = [module.acm]
 }
 
+resource "aws_vpc_security_group_ingress_rule" "this" {
+  for_each = {
+    for pair in setproduct(var.services.security_group_ids, var.rancher.security_group_ids) : pair[0] => pair[1]
+  }
+  security_group_id            = each.key
+  ip_protocol                  = "tcp"
+  from_port                    = 443
+  to_port                      = 443
+  referenced_security_group_id = each.value
+}
+
 module "target_group" {
   source   = "../../modules/target-group"
   for_each = { for _, target in var.targets : target.name => target }
@@ -40,7 +51,7 @@ module "target_group" {
   dns      = each.value.dns
   load_balancer = {
     arn               = module.alb.arn
-    listener_arn      = module.alb.http_listener_arn
+    listener_arn      = module.alb.https_listener_arn
     security_group_id = module.alb.security_group_id
     rule_priority     = each.value.rule_priority
     dns_name          = module.alb.dns_name

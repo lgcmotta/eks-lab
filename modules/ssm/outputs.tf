@@ -4,6 +4,6 @@ output "password" {
 }
 
 output "secret_arn" {
-  value = aws_secretsmanager_secret.this.arn
+  value = aws_ssm_parameter.this.arn
 }
 

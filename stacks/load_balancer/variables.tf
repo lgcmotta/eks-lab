@@ -25,6 +25,18 @@ variable "vpc" {
   })
 }
 
+variable "services" {
+  type = object({
+    security_group_ids = list(string)
+  })
+}
+
+variable "rancher" {
+  type = object({
+    security_group_ids = list(string)
+  })
+}
+
 variable "targets" {
   type = list(object({
     name          = string

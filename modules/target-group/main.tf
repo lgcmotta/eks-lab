@@ -39,6 +39,15 @@ variable "vpc_id" {
   type = string
 }
 
+resource "aws_vpc_security_group_egress_rule" "internet" {
+  for_each          = toset(var.cluster.security_group_ids)
+  security_group_id = each.key
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
 resource "aws_vpc_security_group_ingress_rule" "http" {
   for_each                     = toset(var.cluster.security_group_ids)
   security_group_id            = each.key
