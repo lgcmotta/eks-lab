@@ -1,5 +1,5 @@
 module "lb_controller_iam" {
-  source       = "./iam"
+  source       = "iam"
   cluster_name = var.cluster.name
   issuer       = var.cluster.issuer
 }
